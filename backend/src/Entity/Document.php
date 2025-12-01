@@ -6,6 +6,7 @@ use App\Repository\DocumentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Document
 {
     #[ORM\Id]
@@ -28,6 +29,11 @@ class Document
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    public function __construct() {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -92,5 +98,15 @@ class Document
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }
