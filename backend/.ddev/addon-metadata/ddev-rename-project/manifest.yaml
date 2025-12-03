@@ -1,0 +1,8 @@
+name: ddev-rename-project
+repository: iamntz/ddev-rename-project
+version: v1.0.3
+install_date: "2025-12-03T16:39:33+03:00"
+project_files: []
+global_files:
+    - commands/host/rename-project
+removal_actions: []
