@@ -1,4 +1,4 @@
-name: backend
+name: ai-knowledge-manager
 type: php
 docroot: public
 php_version: "8.3"
