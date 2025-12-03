@@ -1,4 +1,4 @@
-const API_URL = "https://ai-knowledge-manager.ddev.site/api";
+const API_URL = "http://ai-knowledge-manager.ddev.site/api";
 
 async function apiRequest(endpoint, method = "GET", body = null, token = null) {
     const headers = { "Content-Type": "application/json" };
