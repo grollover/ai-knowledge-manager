@@ -1,4 +1,4 @@
-const API_URL = "http://ai-knowledge-manager.ddev.site/api";
+const API_URL = "http://auth-service.ddev.site/api";
 
 async function apiRequest(endpoint, method = "GET", body = null, isJson = true) {
     const token = localStorage.getItem("token");
