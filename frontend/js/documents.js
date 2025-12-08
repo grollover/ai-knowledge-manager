@@ -1,37 +1,36 @@
+import { apiRequest } from "./api.js";
+
 const uploadBtn = document.getElementById("uploadBtn");
 const docList = document.getElementById("docList");
 
-async function loadDocuments() {
-    const token = localStorage.getItem("token");
-    const docs = await apiRequest("/documents", "GET", null, token);
-
-    docList.innerHTML = "";
-    docs.forEach(doc => {
-        const li = document.createElement("li");
-        li.textContent = doc.title;
-        docList.appendChild(li);
-    });
+export async function loadDocuments() {
+    try {
+        const docs = await apiRequest("docs", "/documents", "GET");
+        docList.innerHTML = "";
+        docs.forEach(doc => {
+            const li = document.createElement("li");
+            li.textContent = `${doc.title} (${new Date(doc.createdAt).toLocaleString()})`;
+            docList.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Ошибка загрузки документов:", err);
+    }
 }
 
 uploadBtn.addEventListener("click", async () => {
     const title = document.getElementById("title").value;
     const file = document.getElementById("fileInput").files[0];
-    const token = localStorage.getItem("token");
+    if (!title || !file) return alert("Введите название и выберите файл");
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("file", file);
 
-    const response = await fetch(`${API_URL}/documents`, {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` },
-        body: formData
-    });
-
-    if (!response.ok) {
-        alert("Ошибка загрузки");
-    } else {
-        alert("Документ загружен");
+    try {
+        await apiRequest("docs", "/documents", "POST", formData, false);
+        alert("Документ загружен!");
         loadDocuments();
+    } catch (err) {
+        alert("Ошибка: " + err.message);
     }
 });
