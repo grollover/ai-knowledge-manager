@@ -21,7 +21,7 @@ class DocumentController extends AbstractController
     public function list(DocumentRepository $repo): JsonResponse
     {
         $user = $this->getUser();
-        $documents = $repo->findBy(['uploadedBy' => $user]);
+        $documents = $repo->findBy(['uploadedByUserId' => $user->getId()]);
 
         $data = array_map(fn($doc) => [
             'id' => $doc->getId(),
@@ -37,24 +37,11 @@ class DocumentController extends AbstractController
     public function upload(
         Request $request,
         EntityManagerInterface $em,
-        JWTTokenManagerInterface $jwtManager
     ): JsonResponse {
-        /** @var string $authHeader */
-        $authHeader = $request->headers->get('Authorization');
-        if (!$authHeader) {
-            return $this->json(['error' => 'Missing token'], 401);
-        }
 
-        $token = str_replace('Bearer ', '', $authHeader);
-        $data = $jwtManager->parse($token);
-        if (!$data) {
-            return $this->json(['error' => 'Invalid token'], 401);
-        }
-
-        $userId = $data['id'] ?? $data['sub'] ?? null;
-        if (!$userId) {
-            return $this->json(['error' => 'User ID not found in token'], 400);
-        }
+        /** @var \App\Security\JwtUser $user */
+        $user = $this->getUser();
+        $userId = $user->getId(); //Получаем из JWT
 
         $file = $request->files->get('file');
         $title = $request->request->get('title');
