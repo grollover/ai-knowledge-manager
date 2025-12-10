@@ -9,7 +9,7 @@ export async function loadDocuments() {
         docList.innerHTML = "";
         docs.forEach(doc => {
             const li = document.createElement("li");
-            li.textContent = `${doc.title} (${new Date(doc.createdAt).toLocaleString()})`;
+            li.textContent = `${doc.title} (${new Date(doc.createdAt).toLocaleString("ru-RU", { hour12: false })})`;
             docList.appendChild(li);
         });
     } catch (err) {
