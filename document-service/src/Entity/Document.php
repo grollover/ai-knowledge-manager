@@ -6,6 +6,7 @@ use App\Repository\DocumentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Document
 {
     #[ORM\Id]
@@ -28,20 +29,10 @@ class Document
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\PrePersist]
-    public function setCreatedTimestamps(): void
-    {
+    public function __construct() {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
-
-    #[ORM\PreUpdate]
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    // --- Getters / Setters ---
 
     public function getId(): ?int
     {
@@ -53,9 +44,10 @@ class Document
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(string $title): static
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -64,9 +56,10 @@ class Document
         return $this->filePath;
     }
 
-    public function setFilePath(string $filePath): self
+    public function setFilePath(string $filePath): static
     {
         $this->filePath = $filePath;
+
         return $this;
     }
 
@@ -86,8 +79,32 @@ class Document
         return $this->createdAt;
     }
 
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }
