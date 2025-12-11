@@ -1,0 +1,5 @@
+name: rabbitmq-service
+type: generic
+omit_containers: [db, ddev-ssh-agent]
+use_dns_when_possible: true
+web_environment: []
