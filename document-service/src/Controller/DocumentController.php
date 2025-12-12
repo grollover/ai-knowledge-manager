@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Document;
+use App\Message\DocumentUploadedMessage;
 use App\Repository\DocumentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -37,6 +39,7 @@ class DocumentController extends AbstractController
     public function upload(
         Request $request,
         EntityManagerInterface $em,
+        MessageBusInterface $bus,
     ): JsonResponse {
 
         /** @var \App\Security\JwtUser $user */
@@ -62,6 +65,17 @@ class DocumentController extends AbstractController
         $em->persist($doc);
         $em->flush();
 
-        return $this->json(['message' => 'Document uploaded']);
+        //Публикуем событие в RabbitMQ
+        $bus->dispatch(new DocumentUploadedMessage(
+            $doc->getId(),
+            $doc->getFilePath(),
+            $doc->getUploadedByUserId()
+        ));
+
+        return $this->json([
+            'status' => 'ok',
+            'documentId' => $doc->getId(),
+            'message' => 'Документ загружен и отправлен на обработку'
+        ]);
     }
 }
