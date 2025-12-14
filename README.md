@@ -92,9 +92,14 @@ RabbitMQ (отдельный проект):
 ```
 cd rabbitmq-service && ddev start
 ```
+При первом запуске установить ddev аддон rabbitmq 
+```
+ddev add-on get ddev/ddev-rabbitmq
+ddev restart
+```
 
 Панель RabbitMQ → [http://rabbitmq-service.ddev.site:15672](http://rabbitmq-service.ddev.site:15672)  
-(логин: user, пароль: password)
+(логин: rabbitmq, пароль: rabbitmq)
 
 ---
 ## 🧪 Пример взаимодействия
