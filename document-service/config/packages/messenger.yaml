@@ -2,10 +2,17 @@ framework:
     messenger:
         transports:
             ai:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%/messages'
                 options:
                     exchange:
                         name: 'messages'
+                        type: direct
+
+            ai_feedback:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%/documents'
+                options:
+                    exchange:
+                        name: 'documents'
                         type: direct
 
         default_bus: messenger.bus.default
