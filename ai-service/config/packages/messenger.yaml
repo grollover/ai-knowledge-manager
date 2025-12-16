@@ -2,11 +2,19 @@ framework:
     messenger:
         transports:
             async:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%/messages'
                 options:
                     exchange:
                         name: 'messages'
                         type: direct
 
+            documents:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%/documents'
+                options:
+                    exchange:
+                        name: 'documents'
+                        type: direct
+
         routing:
             'App\Message\DocumentUploadedMessage': async
+            'App\Message\DocumentProcessedMessage': documents
