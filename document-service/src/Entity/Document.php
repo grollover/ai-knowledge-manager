@@ -29,6 +29,12 @@ class Document
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 32, options: ["default" => "uploaded"])]
+    private string $status = 'uploaded';
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $summary = null;
+
     public function __construct() {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -106,5 +112,27 @@ class Document
     #[ORM\PreUpdate]
     public function setUpdatedAtValue(): void {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): self
+    {
+        $this->summary = $summary;
+        return $this;
     }
 }
