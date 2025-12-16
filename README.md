@@ -20,7 +20,7 @@ AI Knowledge Manager - это учебный pet-проект, реализов�
 
 - auth-service ↔ document-service - через JWT (trust model)
 - document-service → ai-service - через Symfony Messenger + RabbitMQ
-- (в будущем) ai-service → document-service - событие document.processed
+- ai-service → document-service - событие document.processed
 
 ---
 
@@ -108,7 +108,7 @@ ddev restart
 2. Загружает документ через document-service
 3. document-service сохраняет документ и публикует событие DocumentUploadedMessage в RabbitMQ
 4. ai-service слушает очередь, получает событие и обрабатывает документ
-5. (В будущем) ai-service отправит событие DocumentProcessedMessage обратно
+5. ai-service отправит событие DocumentProcessedMessage обратно
 
 ---
 ## 🧑‍💻 Цели проекта
