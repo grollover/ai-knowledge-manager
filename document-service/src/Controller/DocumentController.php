@@ -59,7 +59,7 @@ class DocumentController extends AbstractController
 
         $doc = new Document();
         $doc->setTitle($title);
-        $doc->setFilePath('/uploads/'.$filename);
+        $doc->setFilePath($filename);
         $doc->setUploadedByUserId($userId);
 
         $em->persist($doc);
