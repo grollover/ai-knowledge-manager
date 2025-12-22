@@ -1,0 +1,30 @@
+version: '3.6'
+services:
+    db:
+        image: pgvector/pgvector:pg17
+        container_name: ddev-${DDEV_SITENAME}-db
+        restart: "no"
+        environment:
+            - POSTGRES_PASSWORD=${DDEV_DATABASE_PASSWORD:-db}
+            - POSTGRES_USER=${DDEV_DATABASE_USER:-db}
+            - POSTGRES_DB=${DDEV_DATABASE_NAME:-db}
+        volumes:
+            # Используем стандартный путь DDEV для томов
+            - "db:/var/lib/postgresql/data"
+            # Инициализационные скрипты
+            - "./postgresql:/docker-entrypoint-initdb.d"
+        ports:
+            - "${DDEV_HOST_DB_PORT:-5432}:5432"
+        labels:
+            com.ddev.site-name: ${DDEV_SITENAME}
+            com.ddev.approot: $DDEV_APPROOT
+        command: ["postgres", "-c", "shared_preload_libraries=vector"]
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DDEV_DATABASE_USER:-db}"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    db:
+        name: "ddev-${DDEV_SITENAME}-postgres"
