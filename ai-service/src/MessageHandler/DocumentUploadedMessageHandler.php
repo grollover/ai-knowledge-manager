@@ -2,9 +2,12 @@
 
 namespace App\MessageHandler;
 
+use App\Entity\Chunk;
 use App\Message\DocumentProcessedMessage;
 use App\Message\DocumentUploadedMessage;
 use App\Service\DocumentProcessor;
+use App\Service\EmbeddingService;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -20,27 +23,37 @@ class DocumentUploadedMessageHandler
         private readonly MessageBusInterface $bus,
         private readonly HttpClientInterface $http,
         private readonly string              $documentServiceBaseUrl,
+        private EmbeddingService             $embedder,
+        private EntityManagerInterface       $em,
     )
     {
     }
 
     public function __invoke(DocumentUploadedMessage $message): void
     {
-        $docId = $message->getDocumentId();
+        $documentId = $message->getDocumentId();
         $userId = $message->getUploadedByUserId();
 
         try {
             $localPath = $this->downloadDocument($message->getFilePath());
             $chunks = $this->processDocument($localPath);
 
-            $summary = sprintf("Document contains %d text chunks ready for embedding.", count($chunks));
+            foreach ($chunks as $chunkText) {
+                $embedding = $this->embedder->embed($chunkText);
+                $chunk = new Chunk($documentId, $chunkText, $embedding);
+                $this->em->persist($chunk);
+            }
+
+            $this->em->flush();
+
+            $summary = sprintf("Saved %d chunks for document #%d", count($chunks), $documentId);
 
             $this->logger->info('[AI SERVICE] Document processed', [
-                'document_id' => $docId,
+                'document_id' => $documentId,
                 'chunks' => count($chunks),
             ]);
 
-            $this->bus->dispatch(new DocumentProcessedMessage($docId, $userId, $summary));
+            $this->bus->dispatch(new DocumentProcessedMessage($documentId, $userId, $summary));
         } catch (TransportExceptionInterface $e) {
             $this->logger->error('[AI SERVICE] Failed to download document', [
                 'error' => $e->getMessage(),
