@@ -106,7 +106,7 @@ class Document
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
