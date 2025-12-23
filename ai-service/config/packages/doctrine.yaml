@@ -10,6 +10,8 @@ doctrine:
         use_savepoints: true
         types:
             vector: App\Doctrine\Type\VectorType
+        mapping_types:
+            vector: vector
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
