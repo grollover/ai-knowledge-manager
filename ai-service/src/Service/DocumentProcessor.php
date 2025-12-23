@@ -42,23 +42,26 @@ class DocumentProcessor
         return trim($text);
     }
 
-    public function chunkText(string $text, int $maxLength = 500): array
+    public function chunkText(string $text, int $maxLength = 500, $encoding = 'UTF-8'): array
     {
         $chunks = [];
-        $paragraphs = preg_split('/\n+/', $text);
-        $current = '';
+        $textLength = mb_strlen($text, $encoding);
 
-        foreach ($paragraphs as $p) {
-            if (strlen($current) + strlen($p) > $maxLength) {
-                $chunks[] = trim($current);
-                $current = $p;
-            } else {
-                $current .= ' ' . $p;
+        for ($i = 0; $i < $textLength; $i += $maxLength) {
+            $chunk = mb_substr($text, $i, $maxLength, $encoding);
+
+            // Если это не последний чанк и следующий символ не пробел
+            if ($i + $maxLength < $textLength && mb_substr($text, $i + $maxLength, 1, $encoding) !== ' ') {
+                // Ищем последний пробел в чанке
+                $lastSpace = mb_strrpos($chunk, ' ', 0, $encoding);
+
+                if ($lastSpace !== false) {
+                    $chunk = mb_substr($chunk, 0, $lastSpace, $encoding);
+                    $i -= ($maxLength - $lastSpace - 1);
+                }
             }
-        }
 
-        if (!empty(trim($current))) {
-            $chunks[] = trim($current);
+            $chunks[] = $chunk;
         }
 
         return $chunks;
