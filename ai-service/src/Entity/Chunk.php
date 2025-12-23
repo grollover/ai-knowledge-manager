@@ -23,7 +23,7 @@ class Chunk
     #[ORM\Column(type: 'vector', options: ["dimensions" => 1536])]
     private mixed $embedding = [];
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
     public function __construct(int $documentId, string $chunkText, array $embedding)
