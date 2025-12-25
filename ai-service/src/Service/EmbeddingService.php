@@ -14,7 +14,7 @@ class EmbeddingService
     {
         // LM Studio работает как OpenAI API
         $this->apiUrl = 'http://host.docker.internal:1234/v1/embeddings';
-        $this->modelName = 'text-embedding-mxbai-embed-large-v1'; // выбери свою модель
+        $this->modelName = 'frida'; // выбери свою модель
     }
 
     public function embed(string $text): array
