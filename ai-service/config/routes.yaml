@@ -9,3 +9,8 @@
 
 controllers:
     resource: routing.controllers
+
+api_query:
+    path: /api/query
+    controller: App\Controller\QueryController::query
+    methods: [POST]
