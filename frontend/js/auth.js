@@ -40,11 +40,13 @@ logoutBtn.addEventListener("click", () => {
 export function showAuth() {
   document.getElementById("auth").style.display = "block";
   document.getElementById("upload").style.display = "none";
+  document.getElementById('ask').style.display = 'none';
 }
 
 export function showApp() {
   document.getElementById("auth").style.display = "none";
   document.getElementById("upload").style.display = "block";
+  document.getElementById('ask').style.display = 'block';
   loadDocuments();
 }
 
@@ -57,3 +59,54 @@ window.addEventListener("DOMContentLoaded", () => {
     showAuth();
   }
 });
+
+
+// ======== AI-вопросы ========
+
+const askSection = document.getElementById('ask');
+const askBtn = document.getElementById('askBtn');
+const questionInput = document.getElementById('question');
+const answerBox = document.getElementById('answer');
+
+if (askBtn) {
+  askBtn.addEventListener('click', async () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const question = questionInput.value.trim();
+
+    if (!token) {
+      alert('Сначала войдите в систему');
+      return;
+    }
+    if (!question) {
+      alert('Введите вопрос');
+      return;
+    }
+
+    askBtn.disabled = true;
+    answerBox.textContent = 'Думаю...';
+
+    try {
+      const response = await fetch('http://ai-service.ddev.site/api/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ question, userId: user.id })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        answerBox.textContent = data.answer || '[Ответ не получен]';
+      } else {
+        answerBox.textContent = 'Ошибка: ' + (data.error || response.statusText);
+      }
+    } catch (err) {
+      answerBox.textContent = 'Ошибка подключения: ' + err.message;
+    } finally {
+      askBtn.disabled = false;
+    }
+  });
+}
